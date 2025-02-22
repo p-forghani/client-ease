@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from flask import (current_app, flash, redirect, render_template,
                    url_for)
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, logout_user
 
 from app import db
 from app.auth.forms import LoginForm, RegistrationForm
@@ -56,6 +56,8 @@ def register():
 
 @bp.route('/logout')
 def logout():
-    pass
+    if current_user.is_authenticated:
+        logout_user()
+    return redirect(url_for('main.index'))
 
 from app.auth import routes  # noqa
