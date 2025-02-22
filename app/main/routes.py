@@ -1,4 +1,4 @@
-from flask import current_app
+from flask import current_app, render_template
 from flask_login import login_required
 
 from app.main import bp
@@ -9,4 +9,4 @@ from app.main import bp
 @login_required
 def index():
     current_app.logger.info('Index route called')
-    return "Hello, World!"
+    return render_template('base.html')
