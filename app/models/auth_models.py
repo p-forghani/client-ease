@@ -8,7 +8,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from app import db, login
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:    
+if TYPE_CHECKING:
     from app.models import Client
 
 

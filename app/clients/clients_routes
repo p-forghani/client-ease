@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 
 from app import db
 from app.clients import bp
-from app.clients.forms import CreateClientForm
+from app.clients.clients_forms import CreateClientForm
 from app.models import Client
 
 
@@ -14,13 +14,14 @@ def index():
     current_app.logger.info('Index route called')
     clients = Client.query.filter_by(user_id=current_user.id).all()
     # TODO: Render a template for this route
+    # Use pagination to limit the number of clients displayed
     return [client.name for client in clients]
 
 
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
-    "Add a new client"
+    '''Add a new client'''
     form = CreateClientForm()
     if form.validate_on_submit():
         client = Client(
@@ -36,3 +37,6 @@ def add():
         return redirect(url_for('clients.index'))
     # Show the form
     return render_template('clients/add.html', form=form)
+
+
+# TODO: Add routes to edit, delete, and view a client

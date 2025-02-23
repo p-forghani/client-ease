@@ -4,7 +4,7 @@ from flask import (current_app, flash, redirect, render_template,
 from flask_login import current_user, login_user, logout_user
 
 from app import db
-from app.auth.forms import LoginForm, RegistrationForm
+from app.auth.auth_forms import LoginForm, RegistrationForm
 from app.models import User
 from app.auth import bp
 
@@ -60,4 +60,4 @@ def logout():
         logout_user()
     return redirect(url_for('main.index'))
 
-from app.auth import routes  # noqa
+from app.auth import auth_routes  # noqa
