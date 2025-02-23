@@ -1,9 +1,15 @@
+from __future__ import annotations
+from datetime import datetime, timezone
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:    
+    from app.models import Client
 
 
 class User(UserMixin, db.Model):
@@ -18,6 +24,14 @@ class User(UserMixin, db.Model):
         sa.String(120), index=True, unique=True)
     password_hash: so.Mapped[str] = so.mapped_column(
         sa.String(256), nullable=False)
+
+    created_at: so.Mapped[datetime] = so.mapped_column(
+        sa.DateTime, default=datetime.now(tz=timezone.utc))
+
+    # WriteOnlyMapped prevents unnecessary large queries when accessing
+    # clients.
+    clients: so.WriteOnlyMapped[list['Client']] = so.relationship(
+        'Client', back_populates='user')
 
     def __repr__(self) -> str:
         return f'<User {self.name}>'
