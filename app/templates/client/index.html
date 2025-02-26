@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}
+Clients - Account Ease
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>Clients</h2>
+  <a href="{{ url_for('client.add_client') }}" class="btn btn-success mb-3">Add New Client</a>
+  <div class="list-group">
+    {% for client in clients %}
+      <a href="{{ url_for('client.view_client', client_id=client.id) }}" class="list-group-item list-group-item-action">
+        <h5 class="mb-1">{{ client.name }}</h5>
+        <p class="mb-1"><strong>Email:</strong> {{ client.email }}</p>
+        <small><strong>Created At:</strong> {{ client.created_at }}</small>
+      </a>
+    {% else %}
+      <p class="text-muted">No clients found.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

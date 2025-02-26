@@ -1,17 +1,15 @@
 import sqlalchemy as sa
-from flask import (current_app, flash, redirect, render_template,
-                   url_for)
+from flask import flash, redirect, render_template, url_for
 from flask_login import current_user, login_user, logout_user
 
 from app import db
+from app.auth import bp
 from app.auth.auth_forms import LoginForm, RegistrationForm
 from app.models import User
-from app.auth import bp
 
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
-    current_app.logger.info('Login route called')
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     form = LoginForm()
@@ -19,10 +17,11 @@ def login():
         user = db.session.scalar(
             sa.select(User).where(User.email == form.email.data))
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid email or password')
+            flash('Invalid email or password', category='warning')
             return redirect(url_for('auth.login'))
         login_user(user, remember=form.remember_me.data)
-        return redirect(url_for('main.index'))
+        flash('Logged in successfully', category='success')
+        # return redirect(url_for('main.index'))
     return render_template('auth/login.html', title='Sign In', form=form)
 
 

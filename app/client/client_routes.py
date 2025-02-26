@@ -2,8 +2,8 @@ from flask import current_app, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
 from app import db
-from app.clients import bp
-from app.clients.clients_forms import CreateClientForm
+from app.client import bp
+from app.client.client_forms import CreateClientForm
 from app.models import Client
 
 
@@ -13,14 +13,13 @@ def index():
     "Show the list of clients"
     current_app.logger.info('Index route called')
     clients = Client.query.filter_by(user_id=current_user.id).all()
-    # TODO: Render a template for this route
     # Use pagination to limit the number of clients displayed
-    return [client.name for client in clients]
+    return render_template('client/index.html', clients=clients)
 
 
 @bp.route('/add', methods=['GET', 'POST'])
 @login_required
-def add():
+def add_client():
     '''Add a new client'''
     form = CreateClientForm()
     if form.validate_on_submit():
@@ -34,9 +33,30 @@ def add():
         db.session.add(client)
         db.session.commit()
         flash('Client added successfully')
-        return redirect(url_for('clients.index'))
+        return redirect(url_for('client.index'))
     # Show the form
-    return render_template('clients/add.html', form=form)
+    return render_template('client/add_client.html', form=form)
 
 
-# TODO: Add routes to edit, delete, and view a client
+@bp.route('/<client_id>')
+@login_required
+def view_client(client_id):
+    client = Client.query.get_or_404(client_id)
+    return render_template('client/view_client.html', client=client)
+
+
+@bp.route('/<client_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_client(client_id):
+    # TODO: Implement the edit client route
+    pass
+
+
+@bp.route('/<client_id>/delete', methods=['POST'])
+@login_required
+def delete_client(client_id):
+    client = Client.query.get_or_404(client_id)
+    db.session.delete(client)
+    db.session.commit()
+    flash('Client deleted successfully')
+    return redirect(url_for('client.index'))

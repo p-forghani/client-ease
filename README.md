@@ -1,2 +1,2 @@
 # account-ease
-An easier way to manage finances!
+An easier way to manage your clients, projects and finances.
