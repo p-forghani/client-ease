@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 
 from app import db
 from app.client import bp
-from app.client.client_forms import CreateClientForm
+from app.client.client_forms import CreateClientForm, UpdateClientForm
 from app.models import Client
 
 
@@ -47,9 +47,16 @@ def view_client(client_id):
 
 @bp.route('/<client_id>/edit', methods=['GET', 'POST'])
 @login_required
-def edit_client(client_id):
-    # TODO: Implement the edit client route
-    pass
+def update_client(client_id):
+    client = Client.query.get_or_404(client_id)
+    form = UpdateClientForm(obj=client)
+    if form.validate_on_submit():
+        form.populate_obj(client)
+        db.session.commit()
+        flash('Client updated successfully', 'success')
+        return redirect(url_for('client.view_client', client_id=client.id))
+    return render_template('client/update_client.html', form=form,
+                           client=client)
 
 
 @bp.route('/<client_id>/delete', methods=['POST'])

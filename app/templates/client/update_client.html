@@ -3,13 +3,13 @@
 {% from "form_helpers.html" import quick_form, flashed_messages%}
 
 {% block title %}
-Add Client - Account Ease
+Update Client - Account Ease
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
   <h2>Add Client</h2>
   {{ flashed_messages() }}
-  {{ quick_form(form, action=url_for('client.add_client'), method="POST") }}
+  {{ quick_form(form, action=url_for('client.update_client', client_id=client.id), method="POST") }}
 </div>
 {% endblock %}

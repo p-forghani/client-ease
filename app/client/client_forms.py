@@ -11,4 +11,6 @@ class CreateClientForm(FlaskForm):
     address = StringField('Address', validators=[Optional()])
     submit = SubmitField('Add Client')
 
-# TODO: Add UpdateClientForm
+
+class UpdateClientForm(CreateClientForm):
+    submit = SubmitField('Update Client')

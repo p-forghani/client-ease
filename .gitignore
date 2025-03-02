@@ -174,4 +174,4 @@ cython_debug/
 # Custom ignores
 .env
 .history
-*.db
+app.db

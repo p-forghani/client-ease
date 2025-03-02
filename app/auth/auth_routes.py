@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from app.email.email_utils import send_email
 from flask import flash, redirect, render_template, url_for
 from flask_login import current_user, login_user, logout_user
 
@@ -45,6 +46,11 @@ def register():
         # add the user to the database
         db.session.add(user)
         db.session.commit()
+        send_email(
+            to_emails=user.email,
+            subject='Welcome to Flasky',
+            text_content='Welcome to Flasky! You have successfully registered.'
+        )
         # flash a message to the user
         flash('Congratulations, you are now a registered user!')
         # redirect the user to the login page
