@@ -1,5 +1,7 @@
 from __future__ import annotations
 from datetime import datetime, timezone
+from flask import current_app
+from itsdangerous import URLSafeTimedSerializer
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from flask_login import UserMixin
@@ -43,6 +45,27 @@ class User(UserMixin, db.Model):
     def check_password(self, password: str) -> bool:
         '''Check the password hash for the user'''
         return check_password_hash(self.password_hash, password)
+
+    def generate_reset_password_token(self) -> str:
+        '''Generate a reset password token for the user'''
+        serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        return serializer.dumps(
+            self.email, salt=current_app.config['SECURITY_PASSWORD_SALT'])
+
+    @staticmethod
+    def verify_reset_password_token(token: str) -> User:
+        '''Verify the reset password token for the user'''
+        serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        try:
+            email = serializer.loads(
+                token, salt=current_app.config['SECURITY_PASSWORD_SALT'],
+                max_age=86400)
+        except Exception as e:
+            current_app.logger.exception(
+                f'Error verifying reset password token: {e}')
+            return None
+        return db.session.scalar(
+            sa.select(User).where(User.email == email))
 
 
 @login.user_loader

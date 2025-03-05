@@ -41,4 +41,14 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
-# TODO: Add reset password request form and new password form
+class ForgotPasswordForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField(
+        'Confirm Password', validators=[DataRequired(), EqualTo('password')]
+    )
+    submit = SubmitField('Reset Password')
