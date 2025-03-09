@@ -8,7 +8,7 @@ from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from app.models import Client
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class User(UserMixin, db.Model):
     '''User model for the application'''
-
+    __name__ = 'user'
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     first_name: so.Mapped[str] = so.mapped_column(
         sa.String(64), index=True)
@@ -30,13 +30,16 @@ class User(UserMixin, db.Model):
     created_at: so.Mapped[datetime] = so.mapped_column(
         sa.DateTime, default=datetime.now(tz=timezone.utc))
 
+    role_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey('role.id', name='fk_user_role'), index=True, default=2)
+
     # WriteOnlyMapped prevents unnecessary large queries when accessing
     # clients.
     clients: so.WriteOnlyMapped[list['Client']] = so.relationship(
         'Client', back_populates='user')
 
     def __repr__(self) -> str:
-        return f'<User {self.name}>'
+        return f'<{self.first_name} {self.last_name}>'
 
     def set_password(self, password: str) -> None:
         '''Set the password hash for the user'''
@@ -72,3 +75,15 @@ class User(UserMixin, db.Model):
 def load_user(id: int) -> User:
     '''Load a user from the database'''
     return db.session.get(User, int(id))
+
+
+class Role(db.Model):
+    '''Role model for the application'''
+    __name__ = 'role'
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    name: so.Mapped[str] = so.mapped_column(
+        sa.String(64), index=True, unique=True
+    )
+    description: so.Mapped[Optional[str]] = so.mapped_column(
+        sa.String(255), nullable=True
+    )

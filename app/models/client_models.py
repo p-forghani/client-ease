@@ -19,7 +19,6 @@ class Client(db.Model):
 
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     name: so.Mapped[str] = so.mapped_column(sa.String(100), index=True)
-    # TODO: Add first_name and last_name fields
     email: so.Mapped[str] = so.mapped_column(
         sa.String(120), index=True, unique=True)
     phone: so.Mapped[str] = so.mapped_column(sa.String(20), nullable=True)

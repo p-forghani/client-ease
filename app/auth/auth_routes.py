@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for, current_app
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app import db
@@ -41,7 +41,7 @@ def register():
         user = User(
             first_name=form.first_name.data,
             last_name=form.last_name.data,
-            email=form.email.data
+            email=form.email.data,
         )
         # set the password for the user
         user.set_password(form.password.data)
@@ -49,6 +49,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         send_email(
+            from_email=current_app.config['ADMINS'],
             to_emails=user.email,
             subject='Welcome to Flasky',
             text_content='Welcome to Flasky! You have successfully registered.'
@@ -117,3 +118,9 @@ def reset_password(token):
         # redirect the user to the login page
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form, token=token)
+
+
+# TODO:
+# View user for admin only
+
+
