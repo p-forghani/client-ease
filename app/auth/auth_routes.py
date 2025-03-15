@@ -1,13 +1,13 @@
 import sqlalchemy as sa
-from flask import flash, redirect, render_template, url_for, current_app
+from flask import flash, redirect, render_template, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 
 from app import db
 from app.auth import bp
-from app.auth.auth_emails import send_reset_password_email
+from app.auth.auth_emails import (send_reset_password_email,
+                                  send_verification_email)
 from app.auth.auth_forms import (ForgotPasswordForm, LoginForm,
                                  RegistrationForm, ResetPasswordForm)
-from app.email import send_email
 from app.models import User
 
 
@@ -48,14 +48,9 @@ def register():
         # add the user to the database
         db.session.add(user)
         db.session.commit()
-        send_email(
-            from_email=current_app.config['ADMINS'],
-            to_emails=user.email,
-            subject='Welcome to Flasky',
-            text_content='Welcome to Flasky! You have successfully registered.'
-        )
+        send_verification_email(user)
         # flash a message to the user
-        flash('Congratulations, you are now a registered user!')
+        flash('Please check your email to verify your account')
         # redirect the user to the login page
         return redirect(url_for('auth.login'))
     # render the register template
@@ -99,7 +94,7 @@ def reset_password(token):
         return redirect(url_for('main.index'))
 
     # decode the token
-    user = User.verify_reset_password_token(token)
+    user = User.verify_token(token, token_type='reset_password')
     # if the token is invalid
     if user is None:
         flash('Invalid or expired token', category='warning')
@@ -120,7 +115,18 @@ def reset_password(token):
     return render_template('auth/reset_password.html', form=form, token=token)
 
 
-# TODO:
-# View user for admin only
+@bp.route('/verify_email/<token>')
+def verify_email(token):
+    user = User.verify_token(token, token_type='verify_email')
+    if user is None:
+        flash('Invalid or expired token', category='warning')
+        return redirect(url_for('auth.login'))
 
+    if user.email_verified is True:
+        flash("Your email is verified", category='info')
+        return redirect(url_for('auth.login'))
 
+    user.email_verified = True
+    db.session.commit()
+    flash('Your email has been verified.', category='success')
+    return redirect(url_for('auth.login'))
