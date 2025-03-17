@@ -11,7 +11,7 @@ from app import db, login
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from app.models import Client
+    from app.models import Client, Project, Invoice
 
 
 class User(UserMixin, db.Model):
@@ -38,6 +38,12 @@ class User(UserMixin, db.Model):
     # clients.
     clients: so.WriteOnlyMapped[list['Client']] = so.relationship(
         'Client', back_populates='user')
+
+    projects: so.WriteOnlyMapped[list['Project']] = so.relationship(
+        'Project', back_populates='user')
+
+    invoices: so.WriteOnlyMapped[list['Invoice']] = so.relationship(
+        'Invoice', back_populates='user')
 
     def __repr__(self) -> str:
         return f'<{self.first_name} {self.last_name}>'

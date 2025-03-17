@@ -11,7 +11,7 @@ from app import db
 
 # Import User only for type checking to avoid circular imports
 if TYPE_CHECKING:
-    from app.models import User  # Adjust the import path as needed
+    from app.models import User, Project, Invoice
 
 
 class Client(db.Model):
@@ -30,6 +30,11 @@ class Client(db.Model):
     user_id: so.Mapped[int] = so.mapped_column(
         sa.ForeignKey('user.id'), index=True)
     user: so.Mapped['User'] = so.relationship(back_populates='clients')
+
+    projects: so.WriteOnlyMapped[list['Project']] = so.relationship(
+        'Project', back_populates='client', cascade='all, delete-orphan')
+    invoices: so.WriteOnlyMapped[list['Invoice']] = so.relationship(
+        'Invoice', back_populates='client', cascade='all, delete-orphan')
 
     def __repr__(self) -> str:
         return f'<Client: {self.name}>'
