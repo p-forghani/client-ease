@@ -1,4 +1,4 @@
-# account-ease
+# ClientEase
 An easier way to manage your clients, projects and finances.
 
 ## Before You Run
