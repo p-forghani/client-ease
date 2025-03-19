@@ -10,7 +10,19 @@ if TYPE_CHECKING:
 
 
 class Project(db.Model):
-    """Project model for the app"""
+    """
+    Represents a project in the application.
+    Attributes:
+        title (str): The title of the project, with a maximum length of 100
+        characters.
+        description (str, optional): A detailed description of the project.
+        start_date (datetime): The start date and time of the project.
+        end_date (datetime, optional): The end date and time of the project.
+        client_id (int): The unique identifier of the client associated with
+        the project.
+        user_id (int): The unique identifier of the user associated with the
+        project.
+    """
 
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     title: so.Mapped[str] = so.mapped_column(
@@ -22,10 +34,10 @@ class Project(db.Model):
         sa.DateTime, nullable=True)
     client_id: so.Mapped[int] = so.mapped_column(
         sa.ForeignKey('client.id'), index=True)
-    client: so.Mapped['Client'] = so.relationship(
-        'Client', back_populates='projects')
     user_id: so.Mapped[int] = so.mapped_column(
         sa.ForeignKey('user.id'), index=True)
+    client: so.Mapped['Client'] = so.relationship(
+        'Client', back_populates='projects')
     user: so.Mapped['User'] = so.relationship(
         'User', back_populates='projects')
     invoices: so.Mapped[list['Invoice']] = so.relationship(

@@ -1,0 +1,24 @@
+<!-- filepath: /home/pouria/projects/github/client-ease/app/templates/project/view_project.html -->
+{% extends "base.html" %}
+
+{% block title %}
+View Project - Client Ease
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>View Project</h2>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">{{ project.title }}</h5>
+      <p class="card-text"><strong>Description:</strong> {{ project.description }}</p>
+      <p class="card-text"><strong>Start Date:</strong> {{ project.start_date }}</p>
+      <p class="card-text"><strong>End Date:</strong> {{ project.end_date }}</p>
+      <p class="card-text"><strong>Client:</strong> {{ project.client.name }}</p>
+      <a href="{{ url_for('project.edit_project', prj_id=project.id) }}" class="btn btn-primary">Edit</a>
+      <a href="{{ url_for('project.delete_project', prj_id=project.id) }}" class="btn btn-primary">Delete</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
