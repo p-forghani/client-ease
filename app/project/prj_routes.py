@@ -1,6 +1,6 @@
 from flask import flash, redirect, render_template, url_for
 from app.models import Client
-from flask_login import current_user, login_required
+from flask_login import current_user
 
 from app import db
 from app.models import Project
@@ -8,9 +8,19 @@ from app.project import bp
 from app.project.prj_forms import ProjectForm
 
 
+@bp.before_request
+def before_request():
+    """
+    This function is executed before each request to the blueprint.
+    It checks if the current user is authenticated.
+    If the user is not authenticated, it redirects them to the login page.
+    """
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+
+
 # View all prj
 @bp.route('/', methods=['GET'])
-@login_required
 def view_all_projects():
     # Show a list of all the projects
     projects = Project.query.filter_by(
@@ -20,7 +30,6 @@ def view_all_projects():
 
 # Create prj
 @bp.route('/create', methods=['GET', 'POST'])
-@login_required
 def create_project():
     """Creates a project"""
 
@@ -57,7 +66,6 @@ def create_project():
 
 # Edit prj
 @bp.route('/update/<prj_id>', methods=['GET', 'POST'])
-@login_required
 def edit_project(prj_id):
     project = Project.query.get_or_404(prj_id)
     form = ProjectForm(obj=project)
@@ -83,7 +91,6 @@ def edit_project(prj_id):
 
 # View prj
 @bp.route('/<prj_id>', methods=['GET'])
-@login_required
 def view_project(prj_id):
     project = Project.query.get_or_404(prj_id)
     return render_template('project/view_project.html', project=project)
@@ -91,7 +98,6 @@ def view_project(prj_id):
 
 # Delete prj
 @bp.route('/delete/<prj_id>', methods=['GET', 'POST'])
-@login_required
 def delete_project(prj_id):
     project = Project.query.get_or_404(prj_id)
     db.session.delete(project)

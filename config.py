@@ -15,3 +15,4 @@ class Config:
         'verify_email': os.getenv('EMAIL_VERIFICATION_SALT')
     }
     ADMINS = ['forghani.dev@gmail.com']
+    POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))

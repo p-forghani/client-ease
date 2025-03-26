@@ -20,7 +20,7 @@ Projects - Client Ease
     </thead>
     <tbody>
       {% for project in projects %}
-        <tr>
+        <tr onclick="window.location='{{ url_for('project.view_project', prj_id=project.id) }}';" style="cursor:pointer;">
           <td>{{ project.title }}</td>
           <td>{{ project.client.name }}</td>
           <td>{{ project.start_date }}</td>
