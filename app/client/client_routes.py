@@ -1,5 +1,5 @@
 from flask import current_app, flash, redirect, render_template, url_for
-from flask_login import current_user, login_required
+from flask_login import current_user
 
 from app import db
 from app.client import bp
@@ -7,8 +7,18 @@ from app.client.client_forms import CreateClientForm, UpdateClientForm
 from app.models import Client
 
 
+@bp.before_request
+def before_request():
+    """
+    This function is executed before each request to the blueprint.
+    It checks if the current user is authenticated.
+    If the user is not authenticated, it redirects them to the login page.
+    """
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+
+
 @bp.route('/')
-@login_required
 def index():
     "Show the list of clients"
     current_app.logger.info('Index route called')
@@ -18,7 +28,6 @@ def index():
 
 
 @bp.route('/add', methods=['GET', 'POST'])
-@login_required
 def add_client():
     '''Add a new client'''
     form = CreateClientForm()
@@ -39,14 +48,12 @@ def add_client():
 
 
 @bp.route('/<client_id>')
-@login_required
 def view_client(client_id):
     client = Client.query.get_or_404(client_id)
     return render_template('client/view_client.html', client=client)
 
 
 @bp.route('/<client_id>/edit', methods=['GET', 'POST'])
-@login_required
 def update_client(client_id):
     client = Client.query.get_or_404(client_id)
     form = UpdateClientForm(obj=client)
@@ -60,7 +67,6 @@ def update_client(client_id):
 
 
 @bp.route('/<client_id>/delete', methods=['POST'])
-@login_required
 def delete_client(client_id):
     client = Client.query.get_or_404(client_id)
     db.session.delete(client)

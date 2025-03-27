@@ -1,0 +1,16 @@
+<!-- filepath: /home/pouria/projects/github/client-ease/app/templates/project/create_project.html -->
+{% extends "base.html" %}
+
+{% from "form_helpers.html" import quick_form, flashed_messages %}
+
+{% block title %}
+{{ "Edit Invoice" if invoice else "Create Invoice" }} - Client Ease
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>{{ "Edit Invoice" if invoice else "Create a New Invoice" }}</h2>
+  {{ flashed_messages() }}
+  {{ quick_form(form, url_for('invoice.create_invoice', project_id=project_id), method="POST") }}
+</div>
+{% endblock %}

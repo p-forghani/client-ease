@@ -12,5 +12,7 @@ class CreateClientForm(FlaskForm):
     submit = SubmitField('Add Client')
 
 
+# TODO: instead of a separete form and template, use same form and template
+# for creating and updating a client with dynamic values.
 class UpdateClientForm(CreateClientForm):
     submit = SubmitField('Update Client')

@@ -1,2 +1,2 @@
-FLASK_APP = account_ease.py
+FLASK_APP = client_ease.py
 FLASK_DEBUG = 1

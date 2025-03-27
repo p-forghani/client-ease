@@ -22,10 +22,14 @@ def create_app(config_class=Config):
     from app.client import bp as client_bp
     from app.main import bp as main_bp
     from app.admin import bp as admin_bp
+    from app.project import bp as prj_bp
+    from app.invoice import bp as invoice_bp
     app.register_blueprint(admin_bp)
+    app.register_blueprint(prj_bp)
     app.register_blueprint(client_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(invoice_bp)
 
     return app
 

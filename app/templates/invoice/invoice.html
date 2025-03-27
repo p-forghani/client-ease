@@ -1,0 +1,33 @@
+<!-- filepath: /home/pouria/projects/github/client-ease/app/templates/project/view_project.html -->
+{% extends "base.html" %}
+
+{% block title %}
+View Invoice - Client Ease
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>Invoice</h2>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Invoice Details</h5>
+      <p class="card-text"><strong>Invoice Number:</strong> {{ invoice.id }}</p>
+      <p class="card-text"><strong>Date:</strong> {{ invoice.date }}</p>
+      <p class="card-text"><strong>Amount:</strong> {{ invoice.amount }}</p>
+      <p class="card-text"><strong>Status:</strong> {{ invoice.status.value }}</p>
+
+      <h5 class="card-title mt-4">Client Details</h5>
+      <p class="card-text"><strong>Name:</strong> {{ invoice.client.name }}</p>
+      <p class="card-text"><strong>Email:</strong> {{ invoice.client.email }}</p>
+      <p class="card-text"><strong>Phone:</strong> {{ invoice.client.phone }}</p>
+      <p class="card-text"><strong>Address:</strong> {{ invoice.client.address }}</p>
+
+      <h5 class="card-title mt-4">Project Details</h5>
+      <p class="card-text"><strong>Title:</strong> {{ invoice.project.title }}</p>
+      <p class="card-text"><strong>Description:</strong> {{ invoice.project.description }}</p>
+      <p class="card-text"><strong>Start Date:</strong> {{ invoice.project.start_date }}</p>
+      <p class="card-text"><strong>End Date:</strong> {{ invoice.project.end_date }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

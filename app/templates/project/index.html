@@ -1,0 +1,37 @@
+<!-- filepath: /home/pouria/projects/github/client-ease/app/templates/project/index.html -->
+{% extends "base.html" %}
+
+{% block title %}
+Projects - Client Ease
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2>Projects</h2>
+  <a href="{{ url_for('project.create_project') }}" class="btn btn-success mb-3">Create New Project</a>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Title</th>
+        <th scope="col">Client</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for project in projects %}
+        <tr onclick="window.location='{{ url_for('project.view_project', prj_id=project.id) }}';" style="cursor:pointer;">
+          <td>{{ project.title }}</td>
+          <td>{{ project.client.name }}</td>
+          <td>{{ project.start_date }}</td>
+          <td>{{ project.end_date }}</td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="4" class="text-muted">No projects found.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
