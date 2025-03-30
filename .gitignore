@@ -178,4 +178,5 @@ app.db
 create_roles.py
 pg.py
 notepad.md
-.ae_venv/
+writing_tests.md
+.vscode
