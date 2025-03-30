@@ -16,3 +16,10 @@ class Config:
     }
     ADMINS = ['forghani.dev@gmail.com']
     POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))
+
+
+class TestConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///memory:'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    WTF_CSRF_ENABLED = False
