@@ -1,4 +1,5 @@
-from flask import current_app, flash, redirect, render_template, url_for
+from flask import (current_app, flash, redirect, render_template, request,
+                   url_for)
 from flask_login import current_user
 
 from app import db
@@ -20,11 +21,18 @@ def before_request():
 
 @bp.route('/')
 def index():
-    "Show the list of clients"
-    current_app.logger.info('Index route called')
-    clients = Client.query.filter_by(user_id=current_user.id).all()
+    """Shows the list of the clients"""
+    current_app.logger.info('/client/ route called')
+    clients = Client.query.filter_by(user_id=current_user.id).paginate(
+        page=request.args.get('page', 1, type=int),
+        per_page=request.args.get('per_page', 5, type=int),
+        error_out=False,
+    )
     # Use pagination to limit the number of clients displayed
-    return render_template('client/index.html', clients=clients)
+    return render_template(
+        'client/index.html',
+        clients=clients,
+    )
 
 
 @bp.route('/add', methods=['GET', 'POST'])
