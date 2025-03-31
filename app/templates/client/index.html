@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 
+{% from "form_helpers.html" import per_page_menu %}
+{% from "form_helpers.html" import page_navigation %}
+
 {% block title %}
 Clients - Account Ease
 {% endblock %}
@@ -7,9 +10,12 @@ Clients - Account Ease
 {% block content %}
 <div class="container mt-5">
   <h2>Clients</h2>
-  <a href="{{ url_for('client.add_client') }}" class="btn btn-success mb-3">Add New Client</a>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="{{ url_for('client.add_client') }}" class="btn btn-success">Add New Client</a>
+    {{ per_page_menu(pagination_object=clients, route=url_for('client.index'), label='Clients per page:') }}
+  </div>
   <div class="list-group">
-    {% for client in clients %}
+    {% for client in clients.items %}
       <a href="{{ url_for('client.view_client', client_id=client.id) }}" class="list-group-item list-group-item-action">
         <h5 class="mb-1">{{ client.name }}</h5>
         <p class="mb-1"><strong>Email:</strong> {{ client.email }}</p>
@@ -19,5 +25,6 @@ Clients - Account Ease
       <p class="text-muted">No clients found.</p>
     {% endfor %}
   </div>
+  {{ page_navigation(paginate_object=clients, view_endpoint='client.index') }}
 </div>
 {% endblock %}
