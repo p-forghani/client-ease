@@ -1,9 +1,8 @@
-from flask import flash, redirect, render_template, url_for
-from app.models import Client
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user
 
 from app import db
-from app.models import Project
+from app.models import Client, Project
 from app.project import bp
 from app.project.prj_forms import ProjectForm
 
@@ -24,7 +23,11 @@ def before_request():
 def view_all_projects():
     # Show a list of all the projects
     projects = Project.query.filter_by(
-        user_id=current_user.id).all()
+        user_id=current_user.id).paginate(
+        page=request.args.get('page', 1, type=int),
+        per_page=request.args.get('per_page', 10, type=int),
+        error_out=False
+        )
     return render_template('project/index.html', projects=projects)
 
 

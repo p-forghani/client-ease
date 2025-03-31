@@ -1,3 +1,6 @@
+{% from "form_helpers.html" import per_page_menu %}
+{% from "form_helpers.html" import page_navigation %}
+
 <!-- filepath: /home/pouria/projects/github/client-ease/app/templates/project/index.html -->
 {% extends "base.html" %}
 
@@ -8,7 +11,11 @@ Projects - Client Ease
 {% block content %}
 <div class="container mt-5">
   <h2>Projects</h2>
-  <a href="{{ url_for('project.create_project') }}" class="btn btn-success mb-3">Create New Project</a>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="{{ url_for('project.create_project') }}" class="btn btn-success mb-3">Create New Project</a>
+    {{ per_page_menu(pagination_object=projects, route=url_for('project.view_all_projects'), label='Projects per page:') }}  
+  </div>
+
   <table class="table table-striped">
     <thead>
       <tr>
@@ -23,8 +30,8 @@ Projects - Client Ease
         <tr onclick="window.location='{{ url_for('project.view_project', prj_id=project.id) }}';" style="cursor:pointer;">
           <td>{{ project.title }}</td>
           <td>{{ project.client.name }}</td>
-          <td>{{ project.start_date }}</td>
-          <td>{{ project.end_date }}</td>
+          <td>{{ project.start_date.date() }}</td>
+          <td>{{ project.end_date.date() }}</td>
         </tr>
       {% else %}
         <tr>
@@ -33,5 +40,8 @@ Projects - Client Ease
       {% endfor %}
     </tbody>
   </table>
+
+  {{ page_navigation(paginate_object=projects, view_endpoint='project.view_all_projects') }}
+
 </div>
 {% endblock %}

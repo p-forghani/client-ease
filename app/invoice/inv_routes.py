@@ -21,7 +21,15 @@ def before_request():
 
 @bp.route('/', methods=['GET'])
 def get_invoices():
-    'Show all invoices'
+    invoices = Invoice.query.filter_by(
+        user_id=current_user.id).paginate(
+            page=request.args.get('page', 1, type=int),
+            per_page=request.args.get('per_page', 10, type=int),
+    )
+    return render_template(
+        'invoice/index.html',
+        invoices=invoices,
+    )
 
 
 @bp.route('/edit/<int:id>', methods=['GET', 'PUT'])
