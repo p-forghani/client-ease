@@ -1,5 +1,6 @@
 from flask import (current_app, flash, redirect, render_template, request,
                    url_for)
+from app.utils import paginate_query
 from flask_login import current_user
 
 from app import db
@@ -23,12 +24,10 @@ def before_request():
 def index():
     """Shows the list of the clients"""
     current_app.logger.info('/client/ route called')
-    clients = Client.query.filter_by(user_id=current_user.id).paginate(
-        page=request.args.get('page', 1, type=int),
-        per_page=request.args.get('per_page', 5, type=int),
-        error_out=False,
+    clients = paginate_query(
+        query=Client.query.filter_by(user_id=current_user.id),
+        request=request,
     )
-    # Use pagination to limit the number of clients displayed
     return render_template(
         'client/index.html',
         clients=clients,

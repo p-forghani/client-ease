@@ -1,4 +1,5 @@
 from flask import flash, redirect, render_template, request, url_for
+from app.utils import paginate_query
 from flask_login import current_user
 
 from app import db
@@ -22,12 +23,10 @@ def before_request():
 @bp.route('/', methods=['GET'])
 def view_all_projects():
     # Show a list of all the projects
-    projects = Project.query.filter_by(
-        user_id=current_user.id).paginate(
-        page=request.args.get('page', 1, type=int),
-        per_page=request.args.get('per_page', 10, type=int),
-        error_out=False
-        )
+    projects = paginate_query(
+        query=Project.query.filter_by(user_id=current_user.id),
+        request=request,
+    )
     return render_template('project/index.html', projects=projects)
 
 

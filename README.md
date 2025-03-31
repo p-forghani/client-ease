@@ -10,4 +10,3 @@ Before running the application, make sure to set the following environment varia
 - `DATABASE_URL`
 - `SECRET_KEY`
 - `SENDGRID_API_KEY`
-- `POSTS_PER_PAGE`

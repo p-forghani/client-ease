@@ -1,4 +1,5 @@
 from app.invoice import bp
+from app.utils import paginate_query
 from app.models import Project
 from app import db
 from app.models import Invoice
@@ -21,10 +22,9 @@ def before_request():
 
 @bp.route('/', methods=['GET'])
 def get_invoices():
-    invoices = Invoice.query.filter_by(
-        user_id=current_user.id).paginate(
-            page=request.args.get('page', 1, type=int),
-            per_page=request.args.get('per_page', 10, type=int),
+    invoices = paginate_query(
+        query=Invoice.query.filter_by(user_id=current_user.id),
+        request=request,
     )
     return render_template(
         'invoice/index.html',
