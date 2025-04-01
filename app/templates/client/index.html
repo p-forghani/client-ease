@@ -1,5 +1,6 @@
 {% from "form_helpers.html" import per_page_menu %}
 {% from "form_helpers.html" import page_navigation %}
+{% from "form_helpers.html" import search_bar %}
 
 
 {% extends "base.html" %}
@@ -15,6 +16,7 @@ Clients - Account Ease
     <a href="{{ url_for('client.add_client') }}" class="btn btn-success">Add New Client</a>
     {{ per_page_menu(pagination_object=clients, route=url_for('client.index'), label='Clients per page:') }}
   </div>
+  {{ search_bar(pagination_object=clients, route=url_for('client.index'), placeholder="Search clients...") }}
   <div class="list-group">
     {% for client in clients.items %}
       <a href="{{ url_for('client.view_client', client_id=client.id) }}" class="list-group-item list-group-item-action">

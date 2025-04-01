@@ -1,7 +1,8 @@
 from app.models import Client
 from sqlalchemy.orm import Session
-from flask_sqlalchemy import BaseQuery
+from sqlalchemy.orm import Query
 from flask import Request
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 
 def get_client_by_name(client_name: str, session: Session):
@@ -9,12 +10,12 @@ def get_client_by_name(client_name: str, session: Session):
 
 
 def paginate_query(
-    query: BaseQuery,
+    query,
     request: Request,
     page: int | None = None,
     per_page: int | None = None,
     error_out: bool = True
-) -> BaseQuery:
+):
     """
     Paginates a SQLAlchemy query object based on request arguments or provided
     parameters.
@@ -36,3 +37,26 @@ def paginate_query(
     page = page or request.args.get("page", default=1, type=int)
     per_page = per_page or request.args.get("per_page", default=10, type=int)
     return query.paginate(page=page, per_page=per_page, error_out=error_out)
+
+
+def search_in_query(
+    query: Query,
+    request: Request,
+    field: InstrumentedAttribute,
+) -> Query:
+    """
+    Filters a SQLAlchemy query object based on a search parameter in the
+    request.
+
+    Args:
+        query (Query): The SQLAlchemy query object to filter.
+        request (Request): The HTTP request object containing query parameters.
+        field (InstrumentedAttribute): The model column to filter on.
+
+    Returns:
+        Query: The filtered query object.
+    """
+    search_query = request.args.get('search')
+    if search_query:
+        query = query.filter(field.ilike(f"%{search_query.strip()}%"))
+    return query

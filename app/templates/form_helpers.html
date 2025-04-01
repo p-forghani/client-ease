@@ -84,6 +84,7 @@
 {% macro per_page_menu(pagination_object, route, label) %}
 {% with per_page=pagination_object.per_page %}
 <form method="get" action="{{ route }}" class="form-inline">
+  <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
   <label for="per_page" class="mr-2">{{ label }}</label>
   <select name="per_page" id="per_page" class="form-control mr-2" onchange="this.form.submit()">
     <option value="5" {% if per_page == 5 %}selected{% endif %}>5</option>
@@ -138,4 +139,18 @@
     {% endif %}
   </ul>
 </nav>
+{% endmacro %}
+
+
+{% macro search_bar(pagination_object, route, placeholder="Search...") %}
+<form method="get" action="{{ route }}" class="form-inline mb-3">
+  <input
+    type="text"
+    name="search"
+    class="form-control mr-2"
+    placeholder="{{ placeholder }}"
+    value="{{ request.args.get('search', '') }}">
+  <input type="hidden" name="per_page" value="{{ pagination_object.per_page }}">
+  <button type="submit" class="btn btn-primary">Search</button>
+</form>
 {% endmacro %}

@@ -26,6 +26,3 @@ def test_user_model():
     assert user.last_name == "Doe"
     assert user.email == 'john.doe@gmail.com'
     assert user.password_hash == "hashed_password"
-    # TODO: Test __repr__, email_verified, created_at, role_id, generate_token,
-    # validate_token
-

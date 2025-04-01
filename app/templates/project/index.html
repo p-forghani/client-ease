@@ -13,7 +13,7 @@ Projects - Client Ease
   <h2>Projects</h2>
   <div class="d-flex justify-content-between align-items-center mb-3">
     <a href="{{ url_for('project.create_project') }}" class="btn btn-success mb-3">Create New Project</a>
-    {{ per_page_menu(pagination_object=projects, route=url_for('project.view_all_projects'), label='Projects per page:') }}  
+    {{ per_page_menu(pagination_object=projects, route=url_for('project.view_all_projects'), label='Projects per page:') }}
   </div>
 
   <table class="table table-striped">
