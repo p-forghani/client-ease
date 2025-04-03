@@ -1,6 +1,7 @@
 <!-- filepath: /home/pouria/projects/github/client-ease/app/templates/invoice/index.html -->
 {% from "form_helpers.html" import per_page_menu %}
 {% from "form_helpers.html" import page_navigation %}
+{% from "form_helpers.html" import search_bar %}
 
 {% extends "base.html" %}
 
@@ -15,6 +16,35 @@ Invoices - Client Ease
     {{ per_page_menu(pagination_object=invoices, route=url_for('invoice.get_invoices'), label='Invoices per page:') }}
   </div>
 
+  {{ search_bar(pagination_object=invoices, route=url_for('invoice.get_invoices'), placeholder="Search invoices...") }}
+
+  <form method="get" action="{{ url_for('invoice.get_invoices') }}" class="mb-3">
+    {% for key, value in request.args.items() %}
+    {% if key not in ['status', 'date'] %}
+      <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endif %}
+    {% endfor %}
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label for="status" class="form-label">Status</label>
+        <select name="status" id="status" class="form-select">
+          <option value="" {% if not request.args.get('status') %}selected{% endif %}>All</option>
+          <option value="pending" {% if request.args.get('status') == 'pending' %}selected{% endif %}>Pending</option>
+          <option value="paid" {% if request.args.get('status') == 'paid' %}selected{% endif %}>Paid</option>
+          <option value="overdue" {% if request.args.get('status') == 'overdue' %}selected{% endif %}>Overdue</option>
+          <option value="cancelled" {% if request.args.get('status') == 'cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" name="date" id="date" class="form-control" value="{{ request.args.get('date', '') }}">
+      </div>
+      <div class="col-md-4 d-flex align-items-end"></div>
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+      </div>
+    </div>
+  </form>
+
   <table class="table table-striped">
     <thead>
       <tr>
@@ -28,7 +58,7 @@ Invoices - Client Ease
       {% for invoice in invoices %}
         <tr onclick="window.location='{{ url_for('invoice.view_invoice', id=invoice.id) }}';" style="cursor:pointer;">
           <td>{{ invoice.id }}</td>
-          <td>{{ invoice.client.name }}</td>
+          <td>{{ invoice.name }}</td>
           <td>{{ invoice.date.date() }}</td>
           <td>{{ invoice.amount }}</td>
         </tr>

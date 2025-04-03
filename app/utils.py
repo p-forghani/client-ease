@@ -2,7 +2,7 @@ from app.models import Client
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import Query
 from flask import Request
-from sqlalchemy.orm.attributes import InstrumentedAttribute
+from sqlalchemy import or_
 
 
 def get_client_by_name(client_name: str, session: Session):
@@ -42,7 +42,7 @@ def paginate_query(
 def search_in_query(
     query: Query,
     request: Request,
-    field: InstrumentedAttribute,
+    fields: tuple[str] | list[str] | set[str],
 ) -> Query:
     """
     Filters a SQLAlchemy query object based on a search parameter in the
@@ -51,12 +51,36 @@ def search_in_query(
     Args:
         query (Query): The SQLAlchemy query object to filter.
         request (Request): The HTTP request object containing query parameters.
-        field (InstrumentedAttribute): The model column to filter on.
+        fields (Iterable): An iterable of SQLAlchemy column objects to filter
+        on (e.g., Client.name, Client.email).
 
     Returns:
         Query: The filtered query object.
     """
     search_query = request.args.get('search')
     if search_query:
-        query = query.filter(field.ilike(f"%{search_query.strip()}%"))
+        filters = [field.ilike(f'%{search_query}%') for field in fields]
+        if filters:
+            query = query.filter(or_(*filters))
+    return query
+
+
+def apply_filters_to_query(query, model, filters):
+    """
+    Dynamically applies filters to a SQLAlchemy query.
+
+    Args:
+        query (Query): The base SQLAlchemy query.
+        model (Model): The SQLAlchemy model being queried.
+        filters (dict): A dictionary of filters to apply.
+
+    Returns:
+        Query: The filtered query.
+    """
+    if 'status' in filters and filters['status']:
+        query = query.filter(model.status == filters['status'])
+    if 'date' in filters and filters['date']:
+        query = query.filter(model.date == filters['date'])
+    if 'project_id' in filters and filters['project_id']:
+        query = query.filter(model.project_id == filters['project_id'])
     return query

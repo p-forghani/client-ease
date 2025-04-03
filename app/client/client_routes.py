@@ -29,7 +29,7 @@ def index():
         query=search_in_query(
             query=Client.query.filter_by(user_id=current_user.id),
             request=request,
-            field=Client.name
+            fields=(Client.name, Client.email, Client.phone, Client.address)
         ),
         request=request
     )

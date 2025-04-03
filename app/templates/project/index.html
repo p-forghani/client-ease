@@ -1,5 +1,6 @@
 {% from "form_helpers.html" import per_page_menu %}
 {% from "form_helpers.html" import page_navigation %}
+{% from "form_helpers.html" import search_bar %}
 
 <!-- filepath: /home/pouria/projects/github/client-ease/app/templates/project/index.html -->
 {% extends "base.html" %}
@@ -15,6 +16,8 @@ Projects - Client Ease
     <a href="{{ url_for('project.create_project') }}" class="btn btn-success mb-3">Create New Project</a>
     {{ per_page_menu(pagination_object=projects, route=url_for('project.view_all_projects'), label='Projects per page:') }}
   </div>
+
+  {{ search_bar(pagination_object=projects, route=url_for('project.view_all_projects'), placeholder="Search projects...") }}
 
   <table class="table table-striped">
     <thead>

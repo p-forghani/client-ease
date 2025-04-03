@@ -1,12 +1,11 @@
-from app.invoice import bp
-from app.utils import paginate_query
-from app.models import Project
-from app import db
-from app.models import Invoice
-from app.invoice.inv_forms import InvoiceForm
-from flask import request
-from flask import redirect, url_for, flash, render_template
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user
+
+from app import db
+from app.invoice import bp
+from app.invoice.inv_forms import InvoiceForm
+from app.models import Client, Invoice, Project
+from app.utils import paginate_query, search_in_query
 
 
 @bp.before_request
@@ -22,9 +21,44 @@ def before_request():
 
 @bp.route('/', methods=['GET'])
 def get_invoices():
+    # TODO: Check if it possibe to add search_in_query and paginate_query to
+    # the methods of the query itself to be used like
+    # query.search_in_query.paginate_query()
+    query = (
+        Invoice.query
+        .join(Project)
+        .join(Client)
+        .with_entities(
+            Invoice.id,
+            Invoice.amount,
+            Invoice.description,
+            Invoice.date,
+            Invoice.status,
+            Project.title,
+            Client.name
+        )
+        .filter_by(user_id=current_user.id)
+    )
+
+    status = request.args.get('status')
+    date = request.args.get('date')
+    if status:
+        query = query.filter_by(status=status)
+    if date:
+        query = query.filter(Invoice.date == date)
+
     invoices = paginate_query(
-        query=Invoice.query.filter_by(user_id=current_user.id),
-        request=request,
+        search_in_query(
+            query=query,
+            request=request,
+            fields=(
+                Invoice.amount,
+                Invoice.description,
+                Project.title,
+                Client.name
+            )
+        ),
+        request=request
     )
     return render_template(
         'invoice/index.html',
