@@ -31,10 +31,12 @@ class Client(db.Model):
         sa.ForeignKey('user.id'), index=True)
     user: so.Mapped['User'] = so.relationship(back_populates='clients')
 
-    projects: so.WriteOnlyMapped[list['Project']] = so.relationship(
-        'Project', back_populates='client', cascade='all, delete-orphan')
-    invoices: so.WriteOnlyMapped[list['Invoice']] = so.relationship(
-        'Invoice', back_populates='client', cascade='all, delete-orphan')
+    projects: so.Mapped[list['Project']] = so.relationship(
+        'Project', back_populates='client', cascade='all, delete-orphan',
+    )
+    invoices: so.Mapped[list['Invoice']] = so.relationship(
+        'Invoice', back_populates='client', cascade='all, delete-orphan',
+    )
 
     def __repr__(self) -> str:
         return f'<Client: {self.name}>'

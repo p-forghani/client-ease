@@ -7,7 +7,7 @@ View Client - Account Ease
 {% block content %}
 <div class="container mt-5">
   <h2>View Client</h2>
-  <div class="card">
+  <div class="card mb-4"></div>
     <div class="card-body">
       <h5 class="card-title">{{ client.name }}</h5>
       <p class="card-text"><strong>Email:</strong> {{ client.email }}</p>
@@ -19,6 +19,42 @@ View Client - Account Ease
         <button type="submit" class="btn btn-danger">Delete</button>
       </form>
     </div>
+  </div>
+
+  <div class="mb-4">
+    <h3>Projects</h3>
+    <a href="{{ url_for('project.create_project') }}" class="btn btn-success mb-3">Create Project</a>
+    {% if client.projects %}
+      <ul class="list-group">
+        {% for project in client.projects %}
+          <li class="list-group-item">
+            <a href="{{ url_for('project.view_project', prj_id=project.id) }}">{{ project.title }}</a>
+            <p class="mb-0"><strong>Start Date:</strong> {{ project.start_date }}</p>
+            <p class="mb-0"><strong>End Date:</strong> {{ project.end_date }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No projects found for this client.</p>
+    {% endif %}
+  </div>
+
+  <div>
+    <h3>Invoices</h3>
+    {% if client.invoices %}
+      <ul class="list-group">
+        {% for invoice in client.invoices %}
+          <li class="list-group-item">
+            <a href="{{ url_for('invoice.view_invoice', id=invoice.id) }}">Invoice #{{ invoice.id }}</a>
+            <p class="mb-0"><strong>Date:</strong> {{ invoice.date }}</p>
+            <p class="mb-0"><strong>Amount:</strong> ${{ "%.2f"|format(invoice.amount) }}</p>
+            <p class="mb-0"><strong>Status:</strong> {{ invoice.status.value }}</p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No invoices found for this client.</p>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

@@ -37,13 +37,13 @@ class User(UserMixin, db.Model):
     # WriteOnlyMapped prevents unnecessary large queries when accessing
     # clients.
     clients: so.WriteOnlyMapped[list['Client']] = so.relationship(
-        'Client', back_populates='user')
+        'Client', back_populates='user', lazy='dynamic')
 
     projects: so.WriteOnlyMapped[list['Project']] = so.relationship(
-        'Project', back_populates='user')
+        'Project', back_populates='user', lazy='dynamic')
 
     invoices: so.WriteOnlyMapped[list['Invoice']] = so.relationship(
-        'Invoice', back_populates='user')
+        'Invoice', back_populates='user', lazy='dynamic')
 
     def __repr__(self) -> str:
         return f'<{self.first_name} {self.last_name}>'

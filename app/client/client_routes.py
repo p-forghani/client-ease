@@ -2,6 +2,7 @@ from flask import (current_app, flash, redirect, render_template, request,
                    url_for)
 from app.utils import paginate_query, search_in_query
 from flask_login import current_user
+from sqlalchemy.orm import joinedload
 
 from app import db
 from app.client import bp
@@ -61,7 +62,10 @@ def add_client():
 
 @bp.route('/<client_id>')
 def view_client(client_id):
-    client = Client.query.get_or_404(client_id)
+    client = Client.query.options(
+        joinedload(Client.projects),
+        joinedload(Client.invoices),
+        ).get_or_404(client_id)
     return render_template('client/view_client.html', client=client)
 
 
