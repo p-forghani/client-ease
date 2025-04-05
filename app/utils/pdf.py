@@ -68,13 +68,6 @@ def generate_invoice(
                               styles["Normal"]))
     elements.append(Spacer(1, 12))
 
-    # Project Details
-    elements.append(Paragraph(
-        f"<b>Project:</b> {project_name}", styles["Normal"]))
-    elements.append(Paragraph(
-        f"<b>Description:</b> {project_description}", styles["Normal"]))
-    elements.append(Spacer(1, 12))
-
     # Invoice Info
     elements.append(Paragraph(f"<b>Invoice Date:</b> {invoice_date}",
                               styles["Normal"]))
@@ -116,4 +109,4 @@ def generate_invoice(
 
     doc.build(elements)
     buffer.seek(0)
-    return buffer.getvalue()
+    return buffer

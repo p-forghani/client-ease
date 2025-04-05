@@ -1,6 +1,6 @@
 from flask import (current_app, flash, redirect, render_template, request,
                    url_for)
-from app.utils import paginate_query, search_in_query
+from app.utils.db import paginate_query, search_in_query
 from flask_login import current_user
 from sqlalchemy.orm import joinedload
 

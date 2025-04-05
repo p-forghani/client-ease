@@ -1,4 +1,4 @@
-from app.email import send_email
+from app.utils.email_utils import send_email
 from flask import current_app, render_template
 from typing import TYPE_CHECKING
 

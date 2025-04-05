@@ -1,11 +1,13 @@
 from flask import flash, redirect, render_template, request, url_for
+from flask import send_file
 from flask_login import current_user
 
 from app import db
 from app.invoice import bp
 from app.invoice.inv_forms import InvoiceForm
 from app.models import Client, Invoice, Project
-from app.utils import paginate_query, search_in_query
+from app.utils.db import paginate_query, search_in_query
+from app.utils.pdf import generate_invoice
 
 
 @bp.before_request
@@ -105,6 +107,32 @@ def view_invoice(id):
     if (not invoice) or (invoice.project.user_id != current_user.id):
         return 'You are not authorized to view this invoice', 403
     return render_template('invoice/invoice.html', invoice=invoice)
+
+
+@bp.route('/<int:inv_id>/download', methods=['GET'])
+def download_invoice(inv_id):
+    invoice = Invoice.query.get_or_404(inv_id)
+    if (not invoice) or (invoice.project.user_id != current_user.id):
+        return 'You are not authorized to view this invoice', 403
+
+    pdf_buffer = generate_invoice(
+        freelancer=current_user.last_name,
+        client=invoice.client.name,
+        client_address=invoice.client.address,
+        project_name=invoice.project.title,
+        project_description=invoice.project.description,
+        invoice_date=invoice.date,
+        invoice_number=invoice.id,
+        status=invoice.status.value,
+        total_amount=invoice.amount
+    )
+
+    return send_file(
+        pdf_buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=f'invoice_{invoice.id}.pdf'
+    )
 
 
 @bp.route('/create', methods=['GET', 'POST'])
