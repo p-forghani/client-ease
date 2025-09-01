@@ -1,7 +1,7 @@
 <!-- filepath: /home/pouria/projects/github/client-ease/app/templates/project/create_project.html -->
 {% extends "base.html" %}
 
-{% from "form_helpers.html" import quick_form, flashed_messages %}
+{% from "form_helpers.html" import form_field %}
 
 {% block title %}
 {{ "Edit Invoice" if invoice else "Create Invoice" }} - Client Ease
@@ -10,7 +10,23 @@
 {% block content %}
 <div class="container mt-5">
   <h2>{{ "Edit Invoice" if invoice else "Create a New Invoice" }}</h2>
-  {{ flashed_messages() }}
-  {{ quick_form(form, url_for('invoice.create_invoice', project_id=project_id), method="POST") }}
+  
+  <form method="POST" action="{{ url_for('invoice.update_invoice', id=invoice.id) if invoice else url_for('invoice.create_invoice', project_id=project_id) }}">
+    {{ form.hidden_tag() }}
+    
+    {% for field in form %}
+      {% if field.widget.input_type != 'hidden' and field.name != 'submit' %}
+        {{ form_field(field) }}
+      {% endif %}
+    {% endfor %}
+    
+    <div class="form-group mt-3">
+      <button type="submit" class="btn btn-primary me-2">
+        {{ "Update Invoice" if invoice else "Create Invoice" }}
+      </button>
+      <a href="{{ url_for('invoice.view_invoice', id=invoice.id) if invoice else url_for('project.view_project', prj_id=project_id) }}" 
+         class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
 </div>
 {% endblock %}

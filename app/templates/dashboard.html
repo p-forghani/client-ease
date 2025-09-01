@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - ClientEase
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">Welcome back, {{ current_user.first_name }}!</h2>
+                    <p class="text-muted mb-0">Here's what's happening with your business today.</p>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted">{{ moment().format('MMMM Do, YYYY') if moment else '' }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards Row -->
+    <div class="row mb-4">
+        <!-- Clients Summary -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted mb-1">Total Clients</h6>
+                            <h3 class="mb-0 text-primary">{{ dashboard_data.clients.total }}</h3>
+                            <small class="text-success">
+                                <i class="bi bi-arrow-up"></i> +{{ dashboard_data.clients.new_this_month }} this month
+                            </small>
+                        </div>
+                        <div class="text-primary">
+                            <i class="bi bi-people fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('client.index') }}" class="btn btn-outline-primary btn-sm">
+                        View All Clients
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects Summary -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted mb-1">Active Projects</h6>
+                            <h3 class="mb-0 text-info">{{ dashboard_data.projects.active }}</h3>
+                            <small class="text-warning">
+                                <i class="bi bi-clock"></i> {{ dashboard_data.projects.ending_soon }} ending soon
+                            </small>
+                        </div>
+                        <div class="text-info">
+                            <i class="bi bi-kanban fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('project.view_all_projects') }}" class="btn btn-outline-info btn-sm">
+                        View All Projects
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoices Summary -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted mb-1">Pending Invoices</h6>
+                            <h3 class="mb-0 text-success">{{ dashboard_data.invoices.pending }}</h3>
+                            <small class="text-danger">
+                                <i class="bi bi-exclamation-triangle"></i> {{ dashboard_data.invoices.overdue }} overdue
+                            </small>
+                        </div>
+                        <div class="text-success">
+                            <i class="bi bi-receipt fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('invoice.get_invoices') }}" class="btn btn-outline-success btn-sm">
+                        View All Invoices
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Overview -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted mb-1">Pending Amount</h6>
+                            <h3 class="mb-0 text-warning">${{ "%.2f"|format(dashboard_data.invoices.pending_amount) }}</h3>
+                            <small class="text-muted">
+                                <i class="bi bi-currency-dollar"></i> Total outstanding
+                            </small>
+                        </div>
+                        <div class="text-warning">
+                            <i class="bi bi-graph-up fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('invoice.get_invoices') }}" class="btn btn-outline-warning btn-sm">
+                        View Financials
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Quick Actions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        is m<a href="{{ url_for('client.add_client') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-person-plus"></i> Add New Client
+                        </a>
+                        <a href="{{ url_for('project.create_project') }}" class="btn btn-outline-info">
+                            <i class="bi bi-plus-circle"></i> Start New Project
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Deadlines -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Upcoming Deadlines</h5>
+                </div>
+                <div class="card-body">
+                    {% if dashboard_data.upcoming_invoices %}
+                        {% for invoice in dashboard_data.upcoming_invoices %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                            <div>
+                                <strong>{{ invoice.client.name }}</strong>
+                                <br>
+                                <small class="text-muted">${{ "%.2f"|format(invoice.amount) }}</small>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-warning">
+                                    <i class="bi bi-clock"></i> {{ invoice.date.strftime('%b %d') }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">No upcoming deadlines</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Projects -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Projects</h5>
+                </div>
+                <div class="card-body">
+                    {% if dashboard_data.recent_projects %}
+                        {% for project in dashboard_data.recent_projects %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                            <div>
+                                <strong>{{ project.title }}</strong>
+                                <br>
+                                <small class="text-muted">{{ project.client.name }}</small>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-info">
+                                    <i class="bi bi-calendar"></i> {{ project.start_date.strftime('%b %d') }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">No recent projects</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Card (Optional - can be removed or moved) -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-1">Your Profile</h5>
+                            <p class="text-muted mb-0">
+                                <strong>{{ current_user.first_name }} {{ current_user.last_name }}</strong> • 
+                                {{ current_user.email }}
+                                {% if current_user.email_verified %}
+                                    <span class="badge bg-success ms-2">Verified</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark ms-2">Not Verified</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <small class="text-muted">Member since {{ current_user.created_at.strftime('%B %Y') }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

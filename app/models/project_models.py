@@ -43,7 +43,7 @@ class Project(db.Model):
         'User', back_populates='projects')
     invoices: so.Mapped[list['Invoice']] = so.relationship(
         'Invoice', back_populates='project', cascade='all, delete-orphan')
-    # TODO: Add extra information such as hourly or fix price etc.
+    # FUTURE: Add extra information such as hourly or fix price etc.
 
 
 class InvoiceStatus(Enum):

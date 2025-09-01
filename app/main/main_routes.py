@@ -1,12 +1,163 @@
-from flask import current_app, render_template
-from flask_login import login_required
+from flask import current_app, render_template, flash, redirect, url_for
+from flask_login import login_required, current_user
+from datetime import datetime, timedelta
+import sqlalchemy as sa
 
 from app.main import bp
+from app import db
+from app.models import Client, Project, Invoice
+from app.models.project_models import InvoiceStatus
+
+
+@bp.before_request
+def before_request():
+    """
+    This function is executed before each request to the blueprint.
+    It checks if the current user is authenticated and email verified.
+    """
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    
+    # Check if user's email is verified
+    if not current_user.email_verified:
+        flash('Please verify your email address to access the dashboard.', 
+              category='warning')
+        return redirect(url_for('auth.verification_reminder'))
 
 
 @bp.route('/')
-@bp.route('/index')
+@bp.route('/dashboard')
 @login_required
 def index():
     current_app.logger.info('Index route called')
-    return render_template('base.html')
+    
+    # Get current date and calculate date ranges
+    now = datetime.utcnow()
+    week_from_now = now + timedelta(days=7)
+    month_ago = now - timedelta(days=30)
+    
+    # Clients Summary
+    total_clients = db.session.scalar(
+        sa.select(sa.func.count(Client.id))
+        .where(Client.user_id == current_user.id)
+    )
+    
+    new_clients_this_month = db.session.scalar(
+        sa.select(sa.func.count(Client.id))
+        .where(
+            sa.and_(
+                Client.user_id == current_user.id,
+                Client.created_at >= month_ago
+            )
+        )
+    )
+    
+    # Projects Summary
+    total_projects = db.session.scalar(
+        sa.select(sa.func.count(Project.id))
+        .where(Project.user_id == current_user.id)
+    )
+    
+    active_projects = db.session.scalar(
+        sa.select(sa.func.count(Project.id))
+        .where(
+            sa.and_(
+                Project.user_id == current_user.id,
+                Project.end_date.is_(None)  # No end date means active
+            )
+        )
+    )
+    
+    projects_ending_soon = db.session.scalar(
+        sa.select(sa.func.count(Project.id))
+        .where(
+            sa.and_(
+                Project.user_id == current_user.id,
+                Project.end_date.isnot(None),
+                Project.end_date <= week_from_now,
+                Project.end_date >= now
+            )
+        )
+    )
+    
+    # Invoices Summary
+    total_invoices = db.session.scalar(
+        sa.select(sa.func.count(Invoice.id))
+        .where(Invoice.user_id == current_user.id)
+    )
+    
+    pending_invoices = db.session.scalar(
+        sa.select(sa.func.count(Invoice.id))
+        .where(
+            sa.and_(
+                Invoice.user_id == current_user.id,
+                Invoice.status == InvoiceStatus.pending
+            )
+        )
+    )
+    
+    overdue_invoices = db.session.scalar(
+        sa.select(sa.func.count(Invoice.id))
+        .where(
+            sa.and_(
+                Invoice.user_id == current_user.id,
+                Invoice.status == InvoiceStatus.overdue
+            )
+        )
+    )
+    
+    # Calculate total pending amount
+    total_pending_amount = db.session.scalar(
+        sa.select(sa.func.sum(Invoice.amount))
+        .where(
+            sa.and_(
+                Invoice.user_id == current_user.id,
+                Invoice.status.in_([InvoiceStatus.pending, InvoiceStatus.overdue])
+            )
+        )
+    ) or 0
+    
+    # Get recent projects (last 5)
+    recent_projects = db.session.scalars(
+        sa.select(Project)
+        .where(Project.user_id == current_user.id)
+        .order_by(Project.start_date.desc())
+        .limit(5)
+    ).all()
+    
+    # Get upcoming deadlines (invoices due this week)
+    upcoming_invoices = db.session.scalars(
+        sa.select(Invoice)
+        .where(
+            sa.and_(
+                Invoice.user_id == current_user.id,
+                Invoice.status == InvoiceStatus.pending,
+                Invoice.date <= week_from_now,
+                Invoice.date >= now
+            )
+        )
+        .order_by(Invoice.date.asc())
+        .limit(5)
+    ).all()
+    
+    dashboard_data = {
+        'clients': {
+            'total': total_clients,
+            'new_this_month': new_clients_this_month,
+        },
+        'projects': {
+            'total': total_projects,
+            'active': active_projects,
+            'ending_soon': projects_ending_soon,
+        },
+        'invoices': {
+            'total': total_invoices,
+            'pending': pending_invoices,
+            'overdue': overdue_invoices,
+            'pending_amount': total_pending_amount,
+        },
+        'recent_projects': recent_projects,
+        'upcoming_invoices': upcoming_invoices,
+    }
+    
+    return render_template('dashboard.html', dashboard_data=dashboard_data)

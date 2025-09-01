@@ -1,7 +1,7 @@
 <!-- filepath: /home/pouria/projects/github/client-ease/app/templates/project/create_project.html -->
 {% extends "base.html" %}
 
-{% from "form_helpers.html" import quick_form, flashed_messages %}
+{% from "form_helpers.html" import form_field %}
 
 {% block title %}
 {{ "Edit Project" if project else "Create Project" }} - Client Ease
@@ -10,8 +10,23 @@
 {% block content %}
 <div class="container mt-5">
   <h2>{{ "Edit Project" if project else "Create a New Project" }}</h2>
-  {{ flashed_messages() }}
-  {{ quick_form(form, action=url_for('project.edit_project', prj_id=project.id) if project else url_for('project.create_project'), method="POST") }}
+  
+  <form method="POST" action="{{ url_for('project.edit_project', prj_id=project.id) if project else url_for('project.create_project') }}">
+    {{ form.hidden_tag() }}
+    
+    {% for field in form %}
+      {% if field.widget.input_type != 'hidden' and field.name != 'submit' %}
+        {{ form_field(field) }}
+      {% endif %}
+    {% endfor %}
+    
+    <div class="form-group mt-3">
+      <button type="submit" class="btn btn-primary me-2">
+        {{ "Update Project" if project else "Create Project" }}
+      </button>
+      <a href="{{ url_for('project.view_project', prj_id=project.id) if project else url_for('project.view_all_projects') }}" 
+         class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
 </div>
 {% endblock %}
-</div></div>

@@ -39,7 +39,7 @@ Invoices - Client Ease
         <label for="date" class="form-label">Date</label>
         <input type="date" name="date" id="date" class="form-control" value="{{ request.args.get('date', '') }}">
       </div>
-      <div class="col-md-4 d-flex align-items-end"></div>
+      <div class="col-md-4 d-flex align-items-end">
         <button type="submit" class="btn btn-primary w-100">Filter</button>
       </div>
     </div>
@@ -52,19 +52,44 @@ Invoices - Client Ease
         <th scope="col">Client</th>
         <th scope="col">Date Issued</th>
         <th scope="col">Total Amount</th>
+        <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody>
       {% for invoice in invoices %}
-        <tr onclick="window.location='{{ url_for('invoice.view_invoice', id=invoice.id) }}';" style="cursor:pointer;">
+        <tr>
           <td>{{ invoice.id }}</td>
           <td>{{ invoice.name }}</td>
           <td>{{ invoice.date.date() }}</td>
-          <td>{{ invoice.amount }}</td>
+          <td>${{ "%.2f"|format(invoice.amount) }}</td>
+          <td>
+            <div class="btn-group" role="group">
+              <a href="{{ url_for('invoice.view_invoice', id=invoice.id) }}" 
+                 class="btn btn-sm btn-outline-primary" 
+                 title="View Invoice">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ url_for('invoice.update_invoice', id=invoice.id) }}" 
+                 class="btn btn-sm btn-outline-secondary" 
+                 title="Edit Invoice">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <button type="button" 
+                      class="btn btn-sm btn-outline-danger" 
+                      title="Delete Invoice"
+                      data-bs-toggle="modal" 
+                      data-bs-target="#deleteInvoiceModal"
+                      data-invoice-id="{{ invoice.id }}"
+                      data-invoice-amount="{{ invoice.amount }}"
+                      data-client-name="{{ invoice.name }}">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
         </tr>
       {% else %}
         <tr>
-          <td colspan="4" class="text-muted">No invoices found.</td>
+          <td colspan="5" class="text-muted">No invoices found.</td>
         </tr>
       {% endfor %}
     </tbody>
@@ -73,4 +98,99 @@ Invoices - Client Ease
   {{ page_navigation(paginate_object=invoices, view_endpoint='invoice.get_invoices') }}
 
 </div>
+
+<!-- Delete Invoice Modal -->
+<div class="modal fade" id="deleteInvoiceModal" tabindex="-1" aria-labelledby="deleteInvoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteInvoiceModalLabel">Delete Invoice</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete Invoice #<span id="modalInvoiceId"></span>?</p>
+        <p class="text-danger"><strong>This action cannot be undone.</strong></p>
+        <p><strong>Invoice Details:</strong></p>
+        <ul>
+          <li>Amount: $<span id="modalInvoiceAmount"></span></li>
+          <li>Client: <span id="modalClientName"></span></li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+          Delete Invoice
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Handle modal data population
+document.getElementById('deleteInvoiceModal').addEventListener('show.bs.modal', function (event) {
+  const button = event.relatedTarget;
+  const invoiceId = button.getAttribute('data-invoice-id');
+  const invoiceAmount = button.getAttribute('data-invoice-amount');
+  const clientName = button.getAttribute('data-client-name');
+  
+  // Update modal content
+  document.getElementById('modalInvoiceId').textContent = invoiceId;
+  document.getElementById('modalInvoiceAmount').textContent = invoiceAmount;
+  document.getElementById('modalClientName').textContent = clientName;
+  
+  // Set up delete confirmation
+  document.getElementById('confirmDeleteBtn').onclick = function() {
+    deleteInvoice(invoiceId);
+  };
+});
+
+function deleteInvoice(invoiceId) {
+  // Show loading state
+  const deleteBtn = document.getElementById('confirmDeleteBtn');
+  const originalText = deleteBtn.innerHTML;
+  deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deleting...';
+  deleteBtn.disabled = true;
+  
+  // Send DELETE request
+  fetch(`/invoice/${invoiceId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+      // Success - close modal and reload page
+      const modal = bootstrap.Modal.getInstance(document.getElementById('deleteInvoiceModal'));
+      modal.hide();
+      
+      // Reload the page to show updated list
+      window.location.reload();
+    } else if (response.status === 403) {
+      // Unauthorized - Flask will show the 403 error page
+      // We just need to close the modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('deleteInvoiceModal'));
+      modal.hide();
+      // The page will show the 403 error page
+    } else {
+      throw new Error('Failed to delete invoice');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    // Reset button state
+    deleteBtn.innerHTML = originalText;
+    deleteBtn.disabled = false;
+    
+    // Only show alert for network errors, not HTTP errors
+    if (error.name === 'TypeError') {
+      alert('Network error. Please try again.');
+    }
+  });
+}
+</script>
 {% endblock %}

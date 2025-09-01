@@ -1,47 +1,347 @@
-/* General Styles */
+/* ===== CUSTOM COLOR PALETTE ===== */
+:root {
+  /* Primary Colors - Deep Blue/Teal Professional */
+  --primary-color: #2c5f5d;        /* Deep teal-blue */
+  --primary-light: #4a8280;        /* Lighter teal */
+  --primary-dark: #1e4342;         /* Darker teal */
+  
+  /* Secondary Colors - Warm Accent */
+  --secondary-color: #d4a574;      /* Warm gold/tan */
+  --secondary-light: #e6c49a;      /* Light gold */
+  --secondary-dark: #b8935e;       /* Dark gold */
+  
+  /* Neutral Colors */
+  --background-color: #f7f9fc;     /* Very light blue-gray */
+  --surface-color: #ffffff;        /* Pure white */
+  --border-color: #e3eaf0;         /* Light border */
+  
+  /* Text Colors */
+  --text-primary: #2d3748;         /* Dark gray-blue */
+  --text-secondary: #4a5568;       /* Medium gray */
+  --text-muted: #718096;           /* Light gray */
+  
+  /* Status Colors */
+  --success-color: #48bb78;        /* Green */
+  --warning-color: #ed8936;        /* Orange */
+  --danger-color: #e53e3e;         /* Red */
+  --info-color: #4299e1;           /* Blue */
+}
+
+/* ===== GENERAL STYLES ===== */
 body {
-  font-family: 'Roboto', sans-serif;
-  background-color: #f8f9fa;
+  font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  line-height: 1.6;
 }
 
-/* Navbar */
+/* ===== NAVBAR ===== */
 .navbar {
-  border-bottom: 2px solid #0d6efd;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%) !important;
+  border-bottom: 3px solid var(--secondary-color);
+  box-shadow: 0 2px 10px rgba(44, 95, 93, 0.15);
 }
 
-/* Buttons */
-.btn {
-  border-radius: 50px;
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: white !important;
+}
+
+.navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
   transition: all 0.3s ease;
 }
 
+.navbar-nav .nav-link:hover {
+  color: var(--secondary-light) !important;
+  transform: translateY(-1px);
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  padding: 0.6rem 1.2rem;
+}
+
 .btn:hover {
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Tables */
-.table {
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.table thead {
-  background-color: #0d6efd;
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
   color: white;
 }
 
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-dark);
+  color: white;
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #38a169;
+  color: white;
+}
+
+.btn-outline-primary {
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-outline-danger {
+  border: 2px solid var(--danger-color);
+  color: var(--danger-color);
+  background: transparent;
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+/* ===== TABLES ===== */
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: var(--surface-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
+}
+
+.table thead {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  color: white;
+}
+
+.table thead th {
+  border: none;
+  padding: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.table tbody td {
+  border-color: var(--border-color);
+  padding: 1rem;
+  vertical-align: middle;
+}
+
 .table-hover tbody tr:hover {
-  background-color: #f1f1f1;
+  background-color: rgba(74, 130, 128, 0.05);
+  transform: scale(1.001);
+  transition: all 0.2s ease;
 }
 
-/* Cards */
+.table tbody tr {
+  transition: all 0.2s ease;
+}
+
+/* ===== CARDS ===== */
 .card {
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+  box-shadow: 0 4px 20px rgba(44, 95, 93, 0.08);
+  transition: all 0.3s ease;
 }
 
-/* Footer */
+.card:hover {
+  box-shadow: 0 8px 30px rgba(44, 95, 93, 0.15);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  color: white;
+  border-bottom: none;
+  padding: 1.25rem;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-title {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* ===== BADGES ===== */
+.badge {
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.badge.bg-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%) !important;
+}
+
+.badge.bg-success {
+  background-color: var(--success-color) !important;
+}
+
+/* ===== LIST GROUPS ===== */
+.list-group-item {
+  border-color: var(--border-color);
+  background-color: var(--surface-color);
+  transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+  background-color: rgba(74, 130, 128, 0.05);
+  transform: translateX(4px);
+}
+
+.list-group-item-action:hover {
+  background-color: rgba(74, 130, 128, 0.08);
+}
+
+/* ===== ALERTS ===== */
+.alert {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+  background-color: rgba(72, 187, 120, 0.1);
+  color: #2f7d32;
+  border-left: 4px solid var(--success-color);
+}
+
+.alert-danger {
+  background-color: rgba(229, 62, 62, 0.1);
+  color: #c62828;
+  border-left: 4px solid var(--danger-color);
+}
+
+.alert-warning {
+  background-color: rgba(237, 137, 54, 0.1);
+  color: #e65100;
+  border-left: 4px solid var(--warning-color);
+}
+
+.alert-info {
+  background-color: rgba(66, 153, 225, 0.1);
+  color: #1565c0;
+  border-left: 4px solid var(--info-color);
+}
+
+/* ===== FORMS ===== */
+.form-control {
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+  background-color: var(--surface-color);
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(44, 95, 93, 0.15);
+  background-color: var(--surface-color);
+}
+
+.form-label {
+  color: var(--text-primary);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* ===== BREADCRUMBS ===== */
+.breadcrumb {
+  background-color: transparent;
+  padding: 0;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: var(--text-muted);
+}
+
+.breadcrumb-item a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+  color: var(--primary-dark);
+}
+
+.breadcrumb-item.active {
+  color: var(--text-secondary);
+}
+
+/* ===== FOOTER ===== */
 .footer {
-  background-color: #f8f9fa;
-  color: #6c757d;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+  color: rgba(255, 255, 255, 0.8);
+  border-top: 3px solid var(--secondary-color);
+}
+
+.footer a {
+  color: var(--secondary-light) !important;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: white !important;
+}
+
+/* ===== CUSTOM UTILITIES ===== */
+.shadow-custom {
+  box-shadow: 0 8px 30px rgba(44, 95, 93, 0.12);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  .card {
+    border-radius: 12px;
+  }
+  
+  .btn {
+    padding: 0.5rem 1rem;
+  }
+  
+  .table-responsive {
+    border-radius: 12px;
+  }
 }

@@ -1,6 +1,7 @@
 {% from "form_helpers.html" import per_page_menu %}
 {% from "form_helpers.html" import page_navigation %}
 {% from "form_helpers.html" import search_bar %}
+{% from "form_helpers.html" import flashed_messages %}
 
 
 {% extends "base.html" %}
@@ -12,6 +13,7 @@ Clients - Account Ease
 {% block content %}
 <div class="container mt-5">
   <h2>Clients</h2>
+  {{ flashed_messages() }}
   <div class="d-flex justify-content-between align-items-center mb-3">
     <a href="{{ url_for('client.add_client') }}" class="btn btn-success">Add New Client</a>
     {{ per_page_menu(pagination_object=clients, route=url_for('client.index'), label='Clients per page:') }}
@@ -19,15 +21,134 @@ Clients - Account Ease
   {{ search_bar(pagination_object=clients, route=url_for('client.index'), placeholder="Search clients...") }}
   <div class="list-group">
     {% for client in clients.items %}
-      <a href="{{ url_for('client.view_client', client_id=client.id) }}" class="list-group-item list-group-item-action">
-        <h5 class="mb-1">{{ client.name }}</h5>
-        <p class="mb-1"><strong>Email:</strong> {{ client.email }}</p>
-        <small><strong>Created At:</strong> {{ client.created_at }}</small>
-      </a>
+      <div class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="flex-grow-1">
+          <h5 class="mb-1">{{ client.name }}</h5>
+          <p class="mb-1"><strong>Email:</strong> {{ client.email }}</p>
+          <small><strong>Created At:</strong> {{ client.created_at }}</small>
+        </div>
+        <div class="btn-group" role="group">
+          <a href="{{ url_for('client.view_client', client_id=client.id) }}" 
+             class="btn btn-sm btn-outline-primary" 
+             title="View Client">
+            <i class="bi bi-eye"></i>
+          </a>
+          <a href="{{ url_for('client.update_client', client_id=client.id) }}" 
+             class="btn btn-sm btn-outline-secondary" 
+             title="Edit Client">
+            <i class="bi bi-pencil"></i>
+          </a>
+          <button type="button" 
+                  class="btn btn-sm btn-outline-danger" 
+                  title="Delete Client"
+                  data-bs-toggle="modal" 
+                  data-bs-target="#deleteClientModal"
+                  data-client-id="{{ client.id }}"
+                  data-client-name="{{ client.name }}"
+                  data-client-email="{{ client.email }}">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
     {% else %}
       <p class="text-muted">No clients found.</p>
     {% endfor %}
   </div>
   {{ page_navigation(paginate_object=clients, view_endpoint='client.index') }}
 </div>
+
+<!-- Delete Client Modal -->
+<div class="modal fade" id="deleteClientModal" tabindex="-1" aria-labelledby="deleteClientModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteClientModalLabel">Delete Client</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this client?</p>
+        <p class="text-danger"><strong>This action cannot be undone.</strong></p>
+        <p><strong>Client Details:</strong></p>
+        <ul>
+          <li>Name: <span id="modalClientName"></span></li>
+          <li>Email: <span id="modalClientEmail"></span></li>
+        </ul>
+        <p class="text-warning"><strong>Warning:</strong> This will also delete all associated projects and invoices.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+          Delete Client
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Handle modal data population
+document.getElementById('deleteClientModal').addEventListener('show.bs.modal', function (event) {
+  const button = event.relatedTarget;
+  const clientId = button.getAttribute('data-client-id');
+  const clientName = button.getAttribute('data-client-name');
+  const clientEmail = button.getAttribute('data-client-email');
+  
+  // Update modal content
+  document.getElementById('modalClientName').textContent = clientName;
+  document.getElementById('modalClientEmail').textContent = clientEmail;
+  
+  // Set up delete confirmation
+  document.getElementById('confirmDeleteBtn').onclick = function() {
+    deleteClient(clientId);
+  };
+});
+
+function deleteClient(clientId) {
+  // Show loading state
+  const deleteBtn = document.getElementById('confirmDeleteBtn');
+  const originalText = deleteBtn.innerHTML;
+  deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deleting...';
+  deleteBtn.disabled = true;
+  
+  // Send DELETE request
+  fetch(`/client/${clientId}/delete`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+      // Success - close modal and reload page
+      const modal = bootstrap.Modal.getInstance(document.getElementById('deleteClientModal'));
+      modal.hide();
+      
+      // Reload the page to show updated list
+      window.location.reload();
+    } else if (response.status === 403) {
+      // Unauthorized - Flask will show the 403 error page
+      // We just need to close the modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('deleteClientModal'));
+      modal.hide();
+      // The page will show the 403 error page
+    } else {
+      throw new Error('Failed to delete client');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    // Reset button state
+    deleteBtn.innerHTML = originalText;
+    deleteBtn.disabled = false;
+    
+    // Only show alert for network errors, not HTTP errors
+    if (error.name === 'TypeError') {
+      alert('Network error. Please try again.');
+    }
+  });
+}
+</script>
 {% endblock %}

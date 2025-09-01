@@ -42,7 +42,7 @@ def paginate_query(
 def search_in_query(
     query: Query,
     request: Request,
-    fields: tuple[str] | list[str] | set[str],
+    fields: tuple | list | set,
 ) -> Query:
     """
     Filters a SQLAlchemy query object based on a search parameter in the

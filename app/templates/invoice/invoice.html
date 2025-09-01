@@ -1,6 +1,8 @@
 <!-- filepath: /home/pouria/projects/github/client-ease/app/templates/project/view_project.html -->
 {% extends "base.html" %}
 
+{% from "form_helpers.html" import flashed_messages %}
+
 {% block title %}
 View Invoice - Client Ease
 {% endblock %}
@@ -8,6 +10,26 @@ View Invoice - Client Ease
 {% block content %}
 <div class="container mt-5">
   <h2>Invoice</h2>
+  {{ flashed_messages() }}
+  
+  <!-- Action Buttons -->
+  <div class="mb-3">
+    <a href="{{ url_for('invoice.update_invoice', id=invoice.id) }}" 
+       class="btn btn-primary me-2">
+      <i class="bi bi-pencil me-2"></i>Edit Invoice
+    </a>
+    <a href="{{ url_for('invoice.download_invoice', inv_id=invoice.id) }}" 
+       class="btn btn-success me-2">
+      <i class="bi bi-download me-2"></i>Download PDF
+    </a>
+    <button type="button" 
+            class="btn btn-danger" 
+            data-bs-toggle="modal" 
+            data-bs-target="#deleteInvoiceModal">
+      <i class="bi bi-trash me-2"></i>Delete Invoice
+    </button>
+  </div>
+  
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Invoice Details</h5>
@@ -30,4 +52,82 @@ View Invoice - Client Ease
     </div>
   </div>
 </div>
+
+<!-- Delete Invoice Modal -->
+<div class="modal fade" id="deleteInvoiceModal" tabindex="-1" aria-labelledby="deleteInvoiceModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteInvoiceModalLabel">Delete Invoice</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete Invoice #{{ invoice.id }}?</p>
+        <p class="text-danger"><strong>This action cannot be undone.</strong></p>
+        <p><strong>Invoice Details:</strong></p>
+        <ul>
+          <li>Amount: ${{ "%.2f"|format(invoice.amount) }}</li>
+          <li>Client: {{ invoice.client.name }}</li>
+          <li>Project: {{ invoice.project.title }}</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" onclick="deleteInvoice({{ invoice.id }})">
+          Delete Invoice
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function deleteInvoice(invoiceId) {
+  // Show loading state
+  const deleteBtn = document.querySelector('#deleteInvoiceModal .btn-danger');
+  const originalText = deleteBtn.innerHTML;
+  deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deleting...';
+  deleteBtn.disabled = true;
+  
+  // Send DELETE request
+  fetch(`/invoice/${invoiceId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+      // Success - close modal and redirect
+      const modal = bootstrap.Modal.getInstance(document.getElementById('deleteInvoiceModal'));
+      modal.hide();
+      
+      // Show success message and redirect
+      window.location.href = '{{ url_for("project.view_project", prj_id=invoice.project_id) }}';
+    } else if (response.status === 403) {
+      // Unauthorized - Flask will show the 403 error page
+      // We just need to close the modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('deleteInvoiceModal'));
+      modal.hide();
+      // The page will show the 403 error page
+    } else {
+      throw new Error('Failed to delete invoice');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    // Reset button state
+    deleteBtn.innerHTML = originalText;
+    deleteBtn.disabled = false;
+    
+    // Only show alert for network errors, not HTTP errors
+    if (error.name === 'TypeError') {
+      alert('Network error. Please try again.');
+    }
+  });
+}
+</script>
 {% endblock %}

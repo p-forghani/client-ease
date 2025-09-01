@@ -4,7 +4,6 @@ from wtforms import (DateField, SelectField, StringField, SubmitField,
 from wtforms.validators import DataRequired
 
 
-# TODO
 class ProjectForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])

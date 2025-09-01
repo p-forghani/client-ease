@@ -180,3 +180,8 @@ pg.py
 notepad.md
 writing_tests.md
 .vscode
+tmp.py
+
+# Logs
+logs/
+*.log
