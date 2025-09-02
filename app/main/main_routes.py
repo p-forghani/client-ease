@@ -1,6 +1,6 @@
 from flask import current_app, render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import sqlalchemy as sa
 
 from app.main import bp
@@ -9,30 +9,19 @@ from app.models import Client, Project, Invoice
 from app.models.project_models import InvoiceStatus
 
 
-@bp.before_request
-def before_request():
-    """
-    This function is executed before each request to the blueprint.
-    It checks if the current user is authenticated and email verified.
-    """
-    if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
-    
-    # Check if user's email is verified
-    if not current_user.email_verified:
-        flash('Please verify your email address to access the dashboard.', 
-              category='warning')
-        return redirect(url_for('auth.verification_reminder'))
-
-
 @bp.route('/')
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.dashboard'))
+    return render_template('index.html')
+
 @bp.route('/dashboard')
 @login_required
-def index():
-    current_app.logger.info('Index route called')
+def dashboard():
+    current_app.logger.info('Dashboard route called')
     
     # Get current date and calculate date ranges
-    now = datetime.utcnow()
+    now = datetime.now(tz=timezone.utc)
     week_from_now = now + timedelta(days=7)
     month_ago = now - timedelta(days=30)
     
@@ -161,3 +150,4 @@ def index():
     }
     
     return render_template('dashboard.html', dashboard_data=dashboard_data)
+
