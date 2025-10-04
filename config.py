@@ -8,8 +8,11 @@ base_dir = Path(__file__).resolve().parent
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(base_dir, 'app.db')
+    db_url = os.getenv('DATABASE_URL')
+    if db_url and db_url.startswith('postgres://'):
+        db_url = db_url.replace('postgres://', 'postgresql://', 1)
+    SQLALCHEMY_DATABASE_URI = db_url or "sqlite:///app.db"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     SALTS = {
         'reset_password': os.getenv('SECURITY_PASSWORD_SALT'),
