@@ -19,7 +19,7 @@ def create_app(
     if os.getenv('FLASK_ENV') == 'development'
     else ProductionConfig
 ):
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='static')
     app.config.from_object(config_class)
 
     # Disable Flask's default logging to avoid duplicates
