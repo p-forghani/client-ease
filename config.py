@@ -39,9 +39,24 @@ class Config:
     ADMINS = ['forghani.dev@gmail.com']
     BREVO_SENDER_EMAIL = 'forghani.dev@gmail.com'
     
+    # Session Configuration
+    SESSION_COOKIE_SECURE = True  # Only send cookie over HTTPS
+    SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access
+    SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+    PERMANENT_SESSION_LIFETIME = 2592000  # 30 days in seconds
+    
+    # Flask-Login Remember Me Cookie Configuration
+    REMEMBER_COOKIE_DURATION = 2592000  # 30 days in seconds
+    REMEMBER_COOKIE_SECURE = True  # Only send over HTTPS
+    REMEMBER_COOKIE_HTTPONLY = True  # Prevent JavaScript access
+    REMEMBER_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+    
     # Logging Configuration
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
-    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
+    LOG_FORMAT = (
+        '%(asctime)s - %(name)s - %(levelname)s - '
+        '%(filename)s:%(lineno)d - %(message)s'
+    )
     LOG_FILE = os.path.join(base_dir, 'logs', 'app.log')
     
     # Create logs directory if it doesn't exist
@@ -54,11 +69,19 @@ class TestConfig(Config):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED = False
     LOG_LEVEL = 'DEBUG'  # More verbose logging for tests
+    
+    # Disable secure cookies for testing
+    SESSION_COOKIE_SECURE = False
+    REMEMBER_COOKIE_SECURE = False
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
     LOG_LEVEL = 'DEBUG'
+    
+    # Allow insecure cookies for local development (HTTP)
+    SESSION_COOKIE_SECURE = False
+    REMEMBER_COOKIE_SECURE = False
 
 
 class ProductionConfig(Config):
