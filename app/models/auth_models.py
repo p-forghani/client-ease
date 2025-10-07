@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class User(UserMixin, db.Model):
     '''User model for the application'''
-    __name__ = 'user'
+    __tablename__ = 'users'
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     first_name: so.Mapped[str] = so.mapped_column(
         sa.String(64), index=True)
@@ -31,8 +31,10 @@ class User(UserMixin, db.Model):
     created_at: so.Mapped[datetime] = so.mapped_column(
         sa.DateTime, default=datetime.now(tz=timezone.utc))
 
+    # Role ID is the ID of the role of the user
+    # which 1 is admin, 2 is user, 3 is customer
     role_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey('role.id', name='fk_user_role'), index=True, default=2)
+        sa.ForeignKey('roles.id', name='fk_user_role'), index=True, default=2)
 
     # WriteOnlyMapped prevents unnecessary large queries when accessing
     # clients.
@@ -117,7 +119,7 @@ def load_user(id: int) -> User:
 
 class Role(db.Model):
     '''Role model for the application'''
-    __name__ = 'role'
+    __tablename__ = 'roles'
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     name: so.Mapped[str] = so.mapped_column(
         sa.String(64), index=True, unique=True
@@ -125,3 +127,5 @@ class Role(db.Model):
     description: so.Mapped[Optional[str]] = so.mapped_column(
         sa.String(255), nullable=True
     )
+
+# FUTURE: Convert the Role model to an Enum for better type safety and readability

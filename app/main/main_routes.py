@@ -80,7 +80,7 @@ def dashboard():
         .where(
             sa.and_(
                 Invoice.user_id == current_user.id,
-                Invoice.status == InvoiceStatus.pending
+                Invoice.status == InvoiceStatus.PENDING
             )
         )
     )
@@ -90,7 +90,7 @@ def dashboard():
         .where(
             sa.and_(
                 Invoice.user_id == current_user.id,
-                Invoice.status == InvoiceStatus.overdue
+                Invoice.status == InvoiceStatus.OVERDUE
             )
         )
     )
@@ -101,7 +101,7 @@ def dashboard():
         .where(
             sa.and_(
                 Invoice.user_id == current_user.id,
-                Invoice.status.in_([InvoiceStatus.pending, InvoiceStatus.overdue])
+                Invoice.status.in_([InvoiceStatus.PENDING, InvoiceStatus.OVERDUE])
             )
         )
     ) or 0
@@ -120,7 +120,7 @@ def dashboard():
         .where(
             sa.and_(
                 Invoice.user_id == current_user.id,
-                Invoice.status == InvoiceStatus.pending,
+                Invoice.status == InvoiceStatus.PENDING,
                 Invoice.date <= week_from_now,
                 Invoice.date >= now
             )

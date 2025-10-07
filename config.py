@@ -1,17 +1,35 @@
 import os
 import logging
 from pathlib import Path
+from dotenv import load_dotenv
 
 
 base_dir = Path(__file__).resolve().parent
+load_dotenv()
 
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY')
     db_url = os.getenv('DATABASE_URL')
-    if db_url and db_url.startswith('postgres://'):
+    
+    # Require PostgreSQL connection - raise error if not available
+    if not db_url:
+        raise ValueError(
+            "DATABASE_URL environment variable is required. "
+            "Please provide a PostgreSQL connection string."
+        )
+    
+    if db_url.startswith('postgres://'):
         db_url = db_url.replace('postgres://', 'postgresql://', 1)
-    SQLALCHEMY_DATABASE_URI = db_url or "sqlite:///app.db"
+    
+    # Validate that it's a PostgreSQL connection
+    if not db_url.startswith('postgresql://'):
+        raise ValueError(
+            "Only PostgreSQL database connections are supported. "
+            f"Provided URL: {db_url[:20]}..."
+        )
+    
+    SQLALCHEMY_DATABASE_URI = db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     SALTS = {

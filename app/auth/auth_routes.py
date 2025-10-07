@@ -117,6 +117,9 @@ def forgot_password():
         user = db.session.scalar(
             sa.select(User).where(User.email == form.email.data.lower()))
         if user:
+            current_app.logger.info(
+                f'Sending reset password email to user: {user.id},'
+                f' email: {user.email}')
             send_reset_password_email(user)
         flash((
             'If the email address you provided is associated with an account, '

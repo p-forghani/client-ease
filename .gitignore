@@ -181,6 +181,8 @@ notepad.md
 writing_tests.md
 .vscode
 tmp.py
+.flaskenv
+.env.example
 
 # Logs
 logs/

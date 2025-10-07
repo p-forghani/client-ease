@@ -1,10 +1,13 @@
 from app.utils.email_utils import email_client
 from flask import current_app, render_template
 from typing import TYPE_CHECKING
+import logging
 
 if TYPE_CHECKING:
     from app.models import User
 
+
+logger = logging.getLogger(__name__)
 
 def send_reset_password_email(user: 'User') -> None:
     """
@@ -14,10 +17,10 @@ def send_reset_password_email(user: 'User') -> None:
     :return: None
     """
     # Debug logging
-    current_app.logger.info(f'Send reset password email called for user: {user.id}, email: {user.email}')
+    logger.info(f'Send reset password email called for user: {user.id}, email: {user.email}')
     
     if not user.email:
-        current_app.logger.error(f'User {user.id} has no email address')
+        logger.error(f'User {user.id} has no email address')
         raise ValueError("User has no email address")
     
     token = user.generate_token('reset_password')
@@ -31,8 +34,7 @@ def send_reset_password_email(user: 'User') -> None:
                 token=token
             ))
     except Exception as e:
-        current_app.logger.exception(
-            f'Error sending reset password email: {e}')
+        logger.exception(f'Error sending reset password email: {e}')
         raise
 
 

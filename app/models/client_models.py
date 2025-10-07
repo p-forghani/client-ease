@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class Client(db.Model):
     '''Client model for the application'''
-
+    __tablename__ = 'clients'
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     name: so.Mapped[str] = so.mapped_column(sa.String(100), index=True)
     email: so.Mapped[str] = so.mapped_column(
@@ -28,7 +28,7 @@ class Client(db.Model):
         sa.DateTime, default=datetime.now(tz=timezone.utc))
 
     user_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey('user.id'), index=True)
+        sa.ForeignKey('users.id'), index=True)
     user: so.Mapped['User'] = so.relationship(back_populates='clients')
 
     projects: so.Mapped[list['Project']] = so.relationship(

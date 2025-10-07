@@ -24,7 +24,7 @@ class Project(db.Model):
         user_id (int): The unique identifier of the user associated with the
         project.
     """
-
+    __tablename__ = 'projects'
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     title: so.Mapped[str] = so.mapped_column(
         sa.String(100), index=True)
@@ -34,9 +34,9 @@ class Project(db.Model):
     end_date: so.Mapped[datetime] = so.mapped_column(
         sa.DateTime, nullable=True)
     client_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey('client.id'), index=True)
+        sa.ForeignKey('clients.id'), index=True)
     user_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey('user.id'), index=True)
+        sa.ForeignKey('users.id'), index=True)
     client: so.Mapped['Client'] = so.relationship(
         'Client', back_populates='projects')
     user: so.Mapped['User'] = so.relationship(
@@ -47,10 +47,22 @@ class Project(db.Model):
 
 
 class InvoiceStatus(Enum):
-    pending = 'pending'
-    paid = 'paid'
-    overdue = 'overdue'
-    cancelled = 'cancelled'
+    """Invoice status enumeration with descriptive values."""
+    PENDING = 'pending'
+    PAID = 'paid'
+    OVERDUE = 'overdue'
+    CANCELLED = 'cancelled'
+    
+    @classmethod
+    def get_display_name(cls, status):
+        """Get human-readable display name for status."""
+        display_names = {
+            cls.PENDING: 'Pending',
+            cls.PAID: 'Paid',
+            cls.OVERDUE: 'Overdue',
+            cls.CANCELLED: 'Cancelled'
+        }
+        return display_names.get(status, status.value.title())
 
 
 class Invoice(db.Model):
@@ -76,7 +88,7 @@ class Invoice(db.Model):
         client (Client): The client associated with the invoice.
         user (User): The user associated with the invoice.
     """
-
+    __tablename__ = 'invoices'
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     date: so.Mapped[datetime] = so.mapped_column(sa.DateTime, nullable=False)
     amount: so.Mapped[float] = so.mapped_column(sa.Float, nullable=False)
@@ -84,17 +96,17 @@ class Invoice(db.Model):
     status: so.Mapped[InvoiceStatus] = so.mapped_column(
         sa.Enum(InvoiceStatus),
         nullable=False,
-        default=InvoiceStatus.pending.value
+        default=InvoiceStatus.PENDING.value
     )
 
     project_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey('project.id'), index=True)
+        sa.ForeignKey('projects.id'), index=True)
     project: so.Mapped[Project] = so.relationship(
         'Project', back_populates='invoices')
     user_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey('user.id'), index=True)
+        sa.ForeignKey('users.id'), index=True)
     user = so.relationship('User', back_populates='invoices')
     client_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey('client.id'), index=True)
+        sa.ForeignKey('clients.id'), index=True)
     client: so.Mapped['Client'] = so.relationship(
         'Client', back_populates='invoices')
